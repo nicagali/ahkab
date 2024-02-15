@@ -172,6 +172,8 @@ from . import pss
 from . import symbolic
 from . import pz
 
+print('hello')
+
 # parser
 from . import netlist_parser
 
