@@ -172,8 +172,6 @@ from . import pss
 from . import symbolic
 from . import pz
 
-print('hello')
-
 # parser
 from . import netlist_parser
 
@@ -323,6 +321,7 @@ def new_dc(start, stop, points, source, sweep_type='LINEAR', guess=True, x0=None
 
 def new_tran(tstart, tstop, tstep, x0='op', method=transient.TRAP,
         use_step_control=True, outfile=None, verbose=0):
+
     """Assembles a TRAN analysis and returns the analysis object.
 
     The analysis itself can be run with ``ahkab.run(...)``
@@ -677,6 +676,7 @@ def queue(*analysis):
 
 
 def run(circ, an_list=None):
+
     """Run analyses on a circuit.
 
     **Parameters:**
@@ -707,14 +707,21 @@ def run(circ, an_list=None):
             an_list = [an_list] # run(mycircuit, op1)
 
     while len(an_list):
-        an_item = an_list.pop(0)
+
+        an_item = an_list.pop(0) 
+
         an_type = an_item.pop('type')
+
+        print(an_item, an_type)
+
         if 'x0' in an_item and isinstance(an_item['x0'], text_type):
             printing.print_warning("%s has x0 set to %s, unavailable. Using 'None'." %
                                    (an_type.upper(), an_item['x0']))
             an_item['x0'] = None
-        r = analysis[an_type](circ, **an_item)
+        r = analysis[an_type](circ, **an_item)  
+        # for transient, r = transient.transient_analysis(circ, **an_item)
         results.update({an_type: r})
+        
         if an_type == 'op':
             _x0s.update({'op': r})
             _x0s.update({'op+ic': icmodified_x0(circ, r)})

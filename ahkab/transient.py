@@ -120,6 +120,7 @@ specs = {'tran':{'tokens':({
 
 def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_method, use_step_control=True, x0=None,
                        mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3):
+    
     """Performs a transient analysis of the circuit described by circ.
 
     Parameters:

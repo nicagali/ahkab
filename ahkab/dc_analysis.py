@@ -994,6 +994,11 @@ def generate_mna_and_N(circ, verbose=3):
             mna[elem.n1, elem.n2] = mna[elem.n1, elem.n2] - elem.g
             mna[elem.n2, elem.n1] = mna[elem.n2, elem.n1] - elem.g
             mna[elem.n2, elem.n2] = mna[elem.n2, elem.n2] + elem.g
+        elif isinstance(elem, components.Mysistor):
+            mna[elem.n1, elem.n1] = mna[elem.n1, elem.n1] + elem.g
+            mna[elem.n1, elem.n2] = mna[elem.n1, elem.n2] - elem.g
+            mna[elem.n2, elem.n1] = mna[elem.n2, elem.n1] - elem.g
+            mna[elem.n2, elem.n2] = mna[elem.n2, elem.n2] + elem.g
         elif isinstance(elem, components.Capacitor):
             pass  # In a capacitor I(V) = 0
         elif isinstance(elem, components.sources.GISource):
