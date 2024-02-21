@@ -203,6 +203,7 @@ def dc_solve(mna, Ndc, circ, Ntran=None, Gmin=None, x0=None, time=None,
     tot_iterations : int
         Total number of NR iterations run.
     """
+
     if MAXIT == None:
         MAXIT = options.dc_max_nr_iter
     if locked_nodes is None:

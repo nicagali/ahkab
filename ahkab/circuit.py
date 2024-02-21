@@ -495,6 +495,7 @@ class Circuit(list):
             raise CircuitError("ZERO-valued resistors are not allowed.")
 
         elem = components.Resistor(part_id=part_id, n1=n1, n2=n2, value=value)
+        # print(elem)
         self.append(elem)
 
     def add_mysistor(self, part_id, n1, n2, value):

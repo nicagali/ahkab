@@ -712,14 +712,15 @@ def run(circ, an_list=None):
 
         an_type = an_item.pop('type')
 
-        print(an_item, an_type)
-
         if 'x0' in an_item and isinstance(an_item['x0'], text_type):
             printing.print_warning("%s has x0 set to %s, unavailable. Using 'None'." %
                                    (an_type.upper(), an_item['x0']))
             an_item['x0'] = None
+
         r = analysis[an_type](circ, **an_item)  
-        # for transient, r = transient.transient_analysis(circ, **an_item)
+
+        print(vars(circ[0]))
+
         results.update({an_type: r})
         
         if an_type == 'op':

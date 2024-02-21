@@ -117,10 +117,17 @@ specs = {'tran':{'tokens':({
                }
            }
 
+def sigmoid(potential):
+    a=-2.8
+    b=0
+    c=1.3
+    d=2.8
+    return a / (1 + np.exp(-c*(potential-b))) + d
 
 def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_method, use_step_control=True, x0=None,
                        mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3):
     
+
     """Performs a transient analysis of the circuit described by circ.
 
     Parameters:
@@ -137,6 +144,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     verbose: verbosity level from 0 (silent) to 6 (very verbose).
 
     """
+
     if outfile == "stdout":
         verbose = 0
     _debug = False
@@ -261,6 +269,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     thebuffer.add((tstart, x0, None)) #setup the first values
     printing.print_info_line(("done.", 5), verbose) #FIXME
 
+
     #setup the output buffer
     if return_req_dict:
         output_buffer = dfbuffer(length=return_req_dict["points"], width=1)
@@ -313,6 +322,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     rerror[:nv-1, 0] = options.ver
     rerror[nv-1:, 0] = options.ier
 
+
     iter_n = 0  # contatore d'iterazione
     # when to start predicting the next point
     start_pred_iter = max(*[i for i in (0, pmax_x, pmax_dx_plus_1) if i is not None])
@@ -321,7 +331,33 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     printing.print_info_line(("Solving... ", 3), verbose, print_nl=False)
     tick = ticker.ticker(increments_for_step=1)
     tick.display(verbose > 1)
+        # print(x1)
+
+
+    solution_euler_g = open(f"../data/solution_euler_g.txt", "w")
+    current_file = open(f"../data/current_memr.txt", "w")
+
+    conductance = 1/circ[0].value
+    # conductance = 1
+    # conductance = circ[0].value
+    print("intial conductance:", conductance)
+    conductance_vec = [conductance]
+
     while time < tstop:
+
+        circ[0].value=(1/conductance)
+        # circ[0].value = conductance
+        print(vars(circ[0]))
+
+        (mna, N) = dc_analysis.generate_mna_and_N(circ, verbose=verbose)
+        mna = utilities.remove_row_and_col(mna)
+        N = utilities.remove_row(N, rrow=0)
+
+        D = generate_D(circ, (mna.shape[0], mna.shape[0]))
+        D = utilities.remove_row_and_col(D)
+
+        Gmin_matrix = dc_analysis.build_gmin_matrix(circ, options.gmin, mna.shape[0], verbose)
+
         if iter_n < first_iterations_number:
             x_coeff, const, x_lte_coeff, prediction, pred_lte_coeff = \
             implicit_euler.get_df((thebuffer.get_df_vector()[0],), tstep, \
@@ -332,12 +368,13 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
                           predict=(use_step_control and
                                    iter_n >= start_pred_iter)
                          )
+        
 
         if options.transient_prediction_as_x0 and use_step_control and prediction is not None:
             x0 = prediction
         elif x is not None:
             x0 = x
-
+        
         x1, error, solved, n_iter = dc_analysis.dc_solve(
                                                      mna=(mna + np.multiply(x_coeff, D)),
                                                      Ndc=N,  Ntran=np.dot(D, const), circ=circ,
@@ -347,10 +384,13 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
                                                      MAXIT=options.transient_max_nr_iter,
                                                      verbose=0
                                                      )
-
+        
         if solved:
+            
+            current_file.write(f'{time} \t {x1[1][0]} \n')
             old_step = tstep #we will modify it, if we're using step control otherwise it's the same
             # step control (yeah)
+
             if use_step_control:
                 if x_lte_coeff is not None and pred_lte_coeff is not None and prediction is not None:
                     # this is the Local Truncation Error :)
@@ -383,6 +423,11 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
             # if we get here, either aposteriori_step_control is
             # disabled, or it's enabled and the error is small
             # enough. Anyway, the result is GOOD, STORE IT.
+
+            solution_euler_g.write(f'{time} \t {1/circ[0].value} \n')
+            conductance += (sigmoid(x1[0][0])*circ[0].g_0 - conductance)/(circ[0].tau)*tstep
+            conductance_vec.append(conductance)
+
             time = time + old_step
             x = x1
             iter_n = iter_n + 1
@@ -419,14 +464,20 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
         printing.print_info_line(("Average time step: %g" % ((tstop - tstart)/iter_n,), 3), verbose)
 
         if output_buffer:
+
             ret_value = output_buffer.get_as_matrix()
         else:
+
             ret_value = sol
+
+        # print(sol.keys())
+        # print(sol['VN1'])
     else:
         print("failed.")
         ret_value =  None
 
     return ret_value
+
 
 def check_step(tstep, time, tstop, HMAX):
     """Checks the step for several common issues and corrects them.
