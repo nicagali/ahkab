@@ -47,7 +47,7 @@ def plot_conductance(ax, result, plot_type):
 
     if plot_type=="time_dep":
 
-        conductance = (-1)*result['tran']['I(V1)']/result['tran']['VN1']
+        conductance = result['tran']['I(V1)']/result['tran']['VN1']
         print(1/conductance)
         # print("-----------")
         # print(conductance[0], conductance[1])

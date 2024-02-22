@@ -124,6 +124,29 @@ def sigmoid(potential):
     d=2.8
     return a / (1 + np.exp(-c*(potential-b))) + d
 
+def update_memristors(circ, tstep, x):
+
+    for elem in circ:
+
+        if isinstance(elem, components.Mysistor):
+
+            conductance = 1/elem.value
+
+            port = (elem.n1, elem.n2)
+            tempv = 0
+            if port[0]:
+                tempv = x[port[0]-1]
+            if port[1]:
+                tempv = tempv - x[port[1]-1]
+            potential_drop = tempv[0]
+
+            conductance += (sigmoid(potential_drop)*elem.g_0 - conductance)/(elem.tau)*tstep
+
+            elem.value=1/conductance
+    return
+
+
+
 def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_method, use_step_control=True, x0=None,
                        mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3):
     
@@ -322,7 +345,6 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     rerror[:nv-1, 0] = options.ver
     rerror[nv-1:, 0] = options.ier
 
-
     iter_n = 0  # contatore d'iterazione
     # when to start predicting the next point
     start_pred_iter = max(*[i for i in (0, pmax_x, pmax_dx_plus_1) if i is not None])
@@ -331,23 +353,8 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     printing.print_info_line(("Solving... ", 3), verbose, print_nl=False)
     tick = ticker.ticker(increments_for_step=1)
     tick.display(verbose > 1)
-        # print(x1)
-
-
-    solution_euler_g = open(f"../data/solution_euler_g.txt", "w")
-    current_file = open(f"../data/current_memr.txt", "w")
-
-    conductance = 1/circ[0].value
-    # conductance = 1
-    # conductance = circ[0].value
-    print("intial conductance:", conductance)
-    conductance_vec = [conductance]
 
     while time < tstop:
-
-        circ[0].value=(1/conductance)
-        # circ[0].value = conductance
-        print(vars(circ[0]))
 
         (mna, N) = dc_analysis.generate_mna_and_N(circ, verbose=verbose)
         mna = utilities.remove_row_and_col(mna)
@@ -387,7 +394,6 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
         
         if solved:
             
-            current_file.write(f'{time} \t {x1[1][0]} \n')
             old_step = tstep #we will modify it, if we're using step control otherwise it's the same
             # step control (yeah)
 
@@ -424,9 +430,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
             # disabled, or it's enabled and the error is small
             # enough. Anyway, the result is GOOD, STORE IT.
 
-            solution_euler_g.write(f'{time} \t {1/circ[0].value} \n')
-            conductance += (sigmoid(x1[0][0])*circ[0].g_0 - conductance)/(circ[0].tau)*tstep
-            conductance_vec.append(conductance)
+            update_memristors(circ, tstep, x1)
 
             time = time + old_step
             x = x1
@@ -470,8 +474,6 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
 
             ret_value = sol
 
-        # print(sol.keys())
-        # print(sol['VN1'])
     else:
         print("failed.")
         ret_value =  None

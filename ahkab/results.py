@@ -438,6 +438,7 @@ class op_solution(solution, _mutable_data):
         #op_info.append("TOTAL POWER: %e W\n" % (tot_power,))
         return op_keys, op_info, tot_power
 
+
     def write_to_file(self, filename=None):
         if filename is None and self.filename is None:
             # maybe warn the user here?
