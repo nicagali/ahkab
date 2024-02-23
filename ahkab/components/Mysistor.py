@@ -67,6 +67,10 @@ class Mysistor(Component):
         self._value = value
         self._g = 1./value
 
+    def new_nodes(self, n1, n2):
+        self.n1 = n1
+        self.n2 = n2
+
     def i(self, v, time=0):
         return 0
 

@@ -719,7 +719,7 @@ def run(circ, an_list=None):
 
         r = analysis[an_type](circ, **an_item)  
 
-        print(vars(circ[0]))
+        # print(vars(circ[0]))
 
         results.update({an_type: r})
         
