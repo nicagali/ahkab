@@ -129,6 +129,7 @@ def update_memristors(circ, tstep, x):
     for elem in circ:
 
         if isinstance(elem, components.Mysistor):
+            # print('element', elem.part_id)
 
             conductance = 1/elem.value
 
