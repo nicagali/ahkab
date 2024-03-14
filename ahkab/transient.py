@@ -118,11 +118,12 @@ specs = {'tran':{'tokens':({
            }
 
 def sigmoid(potential):
-    a=-2.8
+    a=-3
     b=0
-    c=1.3
-    d=2.8
+    c=1
+    d=3
     return a / (1 + np.exp(-c*(potential-b))) + d
+
 
 def update_memristors(circ, tstep, x):
 
@@ -145,8 +146,6 @@ def update_memristors(circ, tstep, x):
 
             elem.value=1/conductance
     return
-
-
 
 def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_method, use_step_control=True, x0=None,
                        mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3):
@@ -230,6 +229,8 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
         else:
             opsol =  results.op_solution(x=x0, error=np.zeros((mna.shape[0], 1)), circ=circ, outfile=None)
         printing.print_info_line(("Using the supplied op as x(t=%g)." % (tstart,), 5), verbose)
+
+    dc_analysis.modify_x0_for_ic(circ, x0)
 
     if verbose > 4:
         print("x0:")
