@@ -44,7 +44,6 @@ import sys
 import imp
 
 import numpy as np
-import scipy.integrate as integrate
 
 from . import dc_analysis
 from . import implicit_euler
@@ -125,40 +124,6 @@ def sigmoid(potential):
     d=3
     return a / (1 + np.exp(-c*(potential-b))) + d
 
-# Integrand in the definition of average concentration
-
-def integrand(x, potential, mysistor):
-
-    integrand=0
-
-    if np.abs(mysistor.peclet_number*potential)>=0.1:
-
-        radius_x = mysistor.radius_base - (x*mysistor.delta_radius)/mysistor.length_channel
-
-        integrand1 = (x*mysistor.radius_tip)/(radius_x*(mysistor.length_channel))
-
-        integrand2num = np.exp(mysistor.peclet_number*potential*(x/mysistor.length_channel)*((mysistor.radius_tip)**2/(mysistor.radius_base*radius_x))) - 1
-        
-        integrand2den = (np.exp(mysistor.peclet_number*potential*mysistor.radius_tip/mysistor.radius_base) - 1)
-
-        integrand = integrand1 - integrand2num/integrand2den
-
-    return integrand
-
-# Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
-
-def g_infinity_func(potential, mysistor): 
-    
-    length_channel = mysistor.length_channel
-    dx=1e-7
-    delta_g=mysistor.delta_g
-
-    integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(potential,mysistor,), points=length_channel/dx)[0]/length_channel
-
-    g_infty = 1 + delta_g*integral_ginfty
-
-    return g_infty
-
 
 def update_memristors(circ, tstep, x):
 
@@ -176,17 +141,8 @@ def update_memristors(circ, tstep, x):
             if port[1]:
                 tempv = tempv - x[port[1]-1]
             potential_drop = tempv[0]
-            
-            # g_infinity = sigmoid(potential_drop)*elem.g_0
-            g_infinity = g_infinity_func(potential_drop, elem)*elem.g_0
-            # # g_infinity = 3
-            
-            # if elem.part_id=='M2':
-            #     g_infinity = (sigmoid(potential_drop)+0.001)*elem.g_0 
-                
-            # print(g_infinity)
 
-            conductance += (g_infinity - conductance)/(elem.tau)*tstep
+            conductance += (sigmoid(potential_drop)*elem.g_0 - conductance)/(elem.tau)*tstep
 
             elem.value=1/conductance
     return

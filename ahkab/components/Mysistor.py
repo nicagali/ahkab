@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License v2
 # along with ahkab.  If not, see <http://www.gnu.org/licenses/>.
 from .Component import Component
+
+import numpy as np
+
 class Mysistor(Component):
     """A memristor.
 
@@ -38,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value):
+    def __init__(self, part_id, n1, n2, value, rho_b, tau=0.0048):
         self.part_id = part_id
         self._value = value
         self._g = 1./value
@@ -46,8 +49,30 @@ class Mysistor(Component):
         self.is_symbolic = True
         self.n1 = n1
         self.n2 = n2
-        self.tau = 0.0048
-        self.g_0 = 4.20155902
+        
+        self.tau = tau
+        self.rho_b = rho_b
+        
+        self.length_channel = 10e-6
+        self.radius_base = 200e-9
+        self.radius_tip = 50e-9
+        self.delta_radius = self.radius_base - self.radius_tip
+        self.electron_charge = 1.60217663e-19
+        self.boltzman_const = 1.38e-23
+        self.temperature = 293.15
+        self.peclet_number = 16.5
+        
+        self.delta_g = -2*(9.5)*self.delta_radius*0.025/(self.radius_base*self.rho_b)
+        # print(self.delta_g)
+        
+        Dvalue = 1.75e-9
+        avogadro_number = 6.022e23
+        g_1 = np.pi*self.radius_tip*self.radius_base/self.length_channel
+        g_2 = 2*self.rho_b*(self.electron_charge**2)*Dvalue/(self.boltzman_const*self.temperature)
+        
+        self.g_0 = avogadro_number*g_1*g_2*1e12
+        # print(self.g_0)
+
 
     @property
     def g(self, v=0, time=0):
