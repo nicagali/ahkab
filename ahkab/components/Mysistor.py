@@ -41,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value, rho_b, tau=0.0048):
+    def __init__(self, part_id, n1, n2, value, rho_b=0.2, length_channel=10e-6, tau=0.0048):
         self.part_id = part_id
         self._value = value
         self._g = 1./value
@@ -53,7 +53,7 @@ class Mysistor(Component):
         self.tau = tau
         self.rho_b = rho_b
         
-        self.length_channel = 10e-6
+        self.length_channel = length_channel
         self.radius_base = 200e-9
         self.radius_tip = 50e-9
         self.delta_radius = self.radius_base - self.radius_tip
@@ -63,7 +63,6 @@ class Mysistor(Component):
         self.peclet_number = 16.5
         
         self.delta_g = -2*(9.5)*self.delta_radius*0.025/(self.radius_base*self.rho_b)
-        # print(self.delta_g)
         
         Dvalue = 1.75e-9
         avogadro_number = 6.022e23
