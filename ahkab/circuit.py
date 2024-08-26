@@ -498,7 +498,7 @@ class Circuit(list):
         # print(elem)
         self.append(elem)
 
-    def add_mysistor(self, part_id, n1, n2, value, rho_b, length_channel):
+    def add_mysistor(self, part_id, n1, n2, value, rho_b, length_channel, rbrt):
         """Adds a memristor to the circuit.
 
         The resistor instance is added to the circuit elements
@@ -530,7 +530,7 @@ class Circuit(list):
         if value == 0:
             raise CircuitError("ZERO-valued resistors are not allowed.")
 
-        elem = components.Mysistor(part_id=part_id, n1=n1, n2=n2, value=value, rho_b=rho_b, length_channel=length_channel)
+        elem = components.Mysistor(part_id=part_id, n1=n1, n2=n2, value=value, rho_b=rho_b, length_channel=length_channel, rbrt=rbrt)
         self.append(elem)
 
     def add_capacitor(self, part_id, n1, n2, value, ic=None):
