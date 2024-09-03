@@ -62,9 +62,22 @@ class Mysistor(Component):
         self.boltzman_const = 1.38e-23
         self.temperature = 293.15
         self.peclet_number = 16.5
+        # self.dukhin_number = -0.25
+        self.sigma = (-0.25)*2*(0.1)*self.radius_tip
         
+        # ONLY VOLTAGE
         # self.delta_g = -2*(9.5)*self.delta_radius*(0.025)/(self.radius_base*self.rho_b)
-        self.delta_g = -2*(9.5)*self.delta_radius*(1.25e-9)/(self.radius_base*self.rho_b*self.radius_tip)
+        # self.delta_g = -2*(-9.5)*self.delta_radius*(self.sigma/2)/(self.radius_base*self.rho_b*self.radius_tip)
+        
+        # VOLTAGE AND PRESSURE
+        
+        self.delta_rho_over_potential = (2*(self.delta_radius)*self.sigma*self.electron_charge)/(self.boltzman_const*self.temperature*self.radius_tip**2)
+        
+        self.delta_g = delta_rho/(2*rho_b*peclet)
+        
+        self.q_potential = 
+        
+        self.q_pressure
         
         Dvalue = 1.75e-9
         avogadro_number = 6.022e23
