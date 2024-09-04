@@ -127,19 +127,19 @@ def sigmoid(potential):
 
 # Integrand in the definition of average concentration
 
-def integrand(x, potential, mysistor):
+def integrand(x,potential,  mysistor, peclet_number):
 
     integrand=0
 
-    if np.abs(mysistor.peclet_number*potential)>=0.1:
+    if np.abs(peclet_number)>=0.1:
 
         radius_x = mysistor.radius_base - (x*mysistor.delta_radius)/mysistor.length_channel
 
         integrand1 = (x*mysistor.radius_tip)/(radius_x*(mysistor.length_channel))
 
-        integrand2num = np.exp(mysistor.peclet_number*potential*(x/mysistor.length_channel)*((mysistor.radius_tip)**2/(mysistor.radius_base*radius_x))) - 1
+        integrand2num = np.exp(peclet_number*potential*(x/mysistor.length_channel)*((mysistor.radius_tip)**2/(mysistor.radius_base*radius_x))) - 1
         
-        integrand2den = (np.exp(mysistor.peclet_number*potential*mysistor.radius_tip/mysistor.radius_base) - 1)
+        integrand2den = (np.exp(peclet_number*potential*mysistor.radius_tip/mysistor.radius_base) - 1)
 
         integrand = integrand1 - integrand2num/integrand2den
 
@@ -151,9 +151,19 @@ def g_infinity_func(potential, mysistor):
     
     length_channel = mysistor.length_channel
     dx=1e-7
-    delta_g=mysistor.delta_g
+    # delta_g=mysistor.delta_g
+    
+    delta_rho = mysistor.delta_rho_over_potential*potential
 
-    integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(potential,mysistor,), points=length_channel/dx)[0]/length_channel
+    peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential)
+    print(mysistor.peclet_over_q, mysistor.q_potential, peclet_number)
+
+    # delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
+    delta_g = mysistor.delta_g
+    peclet_number = 16.5
+
+
+    integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(potential, mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
     g_infty = 1 + delta_g*integral_ginfty
 
@@ -176,15 +186,13 @@ def update_memristors(circ, tstep, x):
             if port[1]:
                 tempv = tempv - x[port[1]-1]
             potential_drop = tempv[0]
-            
+
+            pressure_drop = 0
+
             # g_infinity = sigmoid(potential_drop)*elem.g_0
             g_infinity = g_infinity_func(potential_drop, elem)*elem.g_0
-            # # g_infinity = 3
-            
-            # if elem.part_id=='M2':
-            #     g_infinity = (sigmoid(potential_drop)+0.001)*elem.g_0 
-                
-            # print(g_infinity)
+
+
 
             if np.abs(g_infinity - conductance)<1e-7:
                 increment=0
@@ -194,9 +202,6 @@ def update_memristors(circ, tstep, x):
             conductance += increment  
 
             elem.value=1/conductance
-
-            # if elem.part_id=='M1':
-            #     print(g_infinity - conductance, increment)
 
     return
 
