@@ -67,17 +67,7 @@ class Mysistor(Component):
         
         # ONLY VOLTAGE
         # self.delta_g = -2*(9.5)*self.delta_radius*(0.025)/(self.radius_base*self.rho_b)
-        # self.delta_g = -2*(-9.5)*self.delta_radius*(self.sigma/2)/(self.radius_base*self.rho_b*self.radius_tip)
-        
-        # VOLTAGE AND PRESSURE
-        
-        self.delta_rho_over_potential = (2*(self.delta_radius)*self.sigma*self.electron_charge)/(self.boltzman_const*self.temperature*self.radius_tip**2)
-        
-        self.delta_g = delta_rho/(2*rho_b*peclet)
-        
-        self.q_potential = 
-        
-        self.q_pressure
+        self.delta_g = -2*(-9.5)*self.delta_radius*(self.sigma/2)/(self.radius_base*self.rho_b*self.radius_tip)
         
         Dvalue = 1.75e-9
         avogadro_number = 6.022e23
