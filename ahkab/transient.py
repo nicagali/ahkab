@@ -157,7 +157,7 @@ def g_infinity_func(potential, mysistor):
 
     g_infty = 1 + delta_g*integral_ginfty
 
-    print(delta_g, integral_ginfty)
+    print(delta_g, integral_ginfty, mysistor.peclet_number)
 
     return g_infty
 
