@@ -137,9 +137,9 @@ def integrand(x,potential,  mysistor, peclet_number):
 
         integrand1 = (x*mysistor.radius_tip)/(radius_x*(mysistor.length_channel))
 
-        integrand2num = np.exp(peclet_number*potential*(x/mysistor.length_channel)*((mysistor.radius_tip)**2/(mysistor.radius_base*radius_x))) - 1
+        integrand2num = np.exp(peclet_number*(x/mysistor.length_channel)*((mysistor.radius_tip)**2/(mysistor.radius_base*radius_x))) - 1
         
-        integrand2den = np.exp(peclet_number*potential*mysistor.radius_tip/mysistor.radius_base) - 1
+        integrand2den = np.exp(peclet_number*mysistor.radius_tip/mysistor.radius_base) - 1
 
         # print(peclet_number*potential)
 
@@ -158,7 +158,6 @@ def g_infinity_func(potential, mysistor):
     delta_rho = mysistor.delta_rho_over_potential*potential
 
     peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential)
-    print(mysistor.peclet_over_q, mysistor.q_potential, peclet_number)
 
     delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
 
@@ -166,7 +165,7 @@ def g_infinity_func(potential, mysistor):
 
     g_infty = 1 + delta_g*integral_ginfty
 
-    print(delta_g, potential, integral_ginfty)
+    # print(delta_g, potential, integral_ginfty, peclet_number/potential)
 
     return g_infty
 
