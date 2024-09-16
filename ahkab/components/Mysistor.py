@@ -65,16 +65,17 @@ class Mysistor(Component):
 
         # constants
         electron_charge = 1.602e-19   # [C] = [A s]
-        kbT = (1.38e-23)*(300)      # [J] = [kg m^2 s^-2]
+        kbT = (1.38e-23)*(293.15)      # [J] = [kg m^2 s^-2]
         sigma = -0.0015e18     #surface charge [m^-2]
         eta = 1.01e-3      #viscosity [Pa s] = [kg m^-1 s^-1] 
-        epsilon = 0.7e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
+        epsilon = 0.71e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
         phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
         diff_coefficient = 1.75e-9      # [m^2 s^-1]
 
+        # derived constants
         w = (electron_charge*diff_coefficient*eta)/(kbT*epsilon*phi0)
         Du = sigma/(2*self.rho_b*self.radius_tip)
-        
+
         # Ohmic conductance
         g_1 = np.pi*self.radius_tip*self.radius_base/self.length_channel
         g_2 = 2*self.rho_b*(electron_charge**2)*diff_coefficient/kbT
@@ -83,7 +84,6 @@ class Mysistor(Component):
 
         # ONLY VOLTAGE
         self.delta_g = (-2)*(w)*self.delta_radius*Du/self.radius_base
-        # print("mysis", self.delta_g)
         
         # VOLTAGE AND PRESSURE
         
@@ -95,9 +95,6 @@ class Mysistor(Component):
 
         self.peclet_over_q = length_channel/(diff_coefficient*np.pi*self.radius_tip**2)
         
-        # self.delta_g = delta_rho/(2*rho_b*peclet)
-        
-
 
     @property
     def g(self, v=0, time=0):

@@ -143,8 +143,6 @@ def integrand(x,potential,  mysistor, peclet_number):
 
         integrand = integrand1 - integrand2num/integrand2den
 
-        # print(integrand1, integrand2num, integrand2den, integrand)
-
     return integrand
 
 # Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
@@ -153,7 +151,6 @@ def g_infinity_func(potential, mysistor):
     
     length_channel = mysistor.length_channel
     dx=1e-7
-    # delta_g=mysistor.delta_g
     
     delta_rho = mysistor.delta_rho_over_potential*potential
 
@@ -164,8 +161,6 @@ def g_infinity_func(potential, mysistor):
     integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(potential, mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
     g_infty = 1 + delta_g*integral_ginfty
-
-    # print(delta_g, potential, integral_ginfty, peclet_number/potential)
 
     return g_infty
 
@@ -191,14 +186,14 @@ def update_memristors(circ, tstep, x):
 
             # g_infinity = sigmoid(potential_drop)*elem.g_0
             g_infinity = g_infinity_func(potential_drop, elem)*elem.g_0
-            print(elem, g_infinity)
 
+            print(potential_drop, conductance, g_infinity, g_infinity - conductance)
 
-
-            if np.abs(g_infinity - conductance)<1e-7:
+            if np.abs(g_infinity - conductance)<1e-3:
                 increment=0
             else:
                 increment = (g_infinity - conductance)/(elem.tau)*tstep
+                
 
             conductance += increment  
 
