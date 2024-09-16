@@ -80,7 +80,6 @@ class Mysistor(Component):
         g_2 = 2*self.rho_b*(electron_charge**2)*diff_coefficient/kbT
         
         self.g_0 = g_1*g_2*1e12     # [S]
-        print(self.g_0)
 
         # ONLY VOLTAGE
         self.delta_g = (-2)*(w)*self.delta_radius*Du/self.radius_base
