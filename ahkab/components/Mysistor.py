@@ -43,13 +43,13 @@ class Mysistor(Component):
     #
     def __init__(self, part_id, n1, n2, value, rho_b=0.2, length_channel=10e-6, rbrt=4, tau=0.0048):
         self.part_id = part_id
-        self._value = value
-        self._g = 1./value
         self.is_nonlinear = False
         self.is_symbolic = True
         self.n1 = n1
         self.n2 = n2
-        
+
+        self._value = value
+        self._g = 1./value
         self.tau = tau
         self.rho_b = rho_b
         self.length_channel = length_channel
@@ -58,24 +58,37 @@ class Mysistor(Component):
         self.radius_tip = 50e-9
         self.radius_base = self.rbrt*self.radius_tip
         self.delta_radius = self.radius_base - self.radius_tip
-        self.electron_charge = 1.60217663e-19
-        self.boltzman_const = 1.38e-23
-        self.temperature = 293.15
-        self.peclet_number = 16.5
+
+
+        electron_charge = 1.60217663e-19    # [C] = [A s]
+        kbT = (1.38e-23)*(300)      # [J] = [kg m^2 s^-2]
+        diff_coefficient = 1.75e-9      # [m^2 s^-1]
+        N_A = 6.022e23      #Avogadro numeber   [1]
+        sigma = -0.0015e18     #surface charge [m^-2]
+        eta = 1.01e-3      #viscosity [Pa s] = [kg m^-1 s^-1] 
+        epsilon = 0.7e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
+        phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
+
+        self.peclet_number = 15.95
         # self.dukhin_number = -0.25
         self.sigma = (-0.25)*2*(0.1)*self.radius_tip
         
         # ONLY VOLTAGE
         # self.delta_g = -2*(9.5)*self.delta_radius*(0.025)/(self.radius_base*self.rho_b)
         self.delta_g = -2*(-9.5)*self.delta_radius*(self.sigma/2)/(self.radius_base*self.rho_b*self.radius_tip)
+
+        self.delta_rho_over_potential = (2*(self.delta_radius)*sigma*electron_charge)/(kbT*self.radius_tip**2)
+
+        self.q_over_potential = (-np.pi)*self.radius_base*self.radius_tip*epsilon*phi0/(eta*self.length_channel)
+
+        self.peclet_over_q = length_channel/(diff_coefficient*np.pi*self.radius_tip**2)
         
-        Dvalue = 1.75e-9
-        avogadro_number = 6.022e23
+
+        # Ohmic conductance
         g_1 = np.pi*self.radius_tip*self.radius_base/self.length_channel
-        g_2 = 2*self.rho_b*(self.electron_charge**2)*Dvalue/(self.boltzman_const*self.temperature)
+        g_2 = 2*self.rho_b*(electron_charge**2)*diff_coefficient/kbT
         
-        self.g_0 = avogadro_number*g_1*g_2*1e12
-        # print(self.g_0)
+        self.g_0 = g_1*g_2*1e12*N_A     # [S]
 
 
     @property

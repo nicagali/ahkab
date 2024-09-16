@@ -151,13 +151,21 @@ def g_infinity_func(potential, mysistor):
     
     length_channel = mysistor.length_channel
     dx=1e-7
-    delta_g=mysistor.delta_g
+    # delta_g=mysistor.delta_g
+
+    N_A = 6.022e23      #Avogadro numeber   [1]
+
+    peclet_number = mysistor.peclet_number
+
+    # peclet_number = mysistor.peclet_over_q * mysistor.q_over_potential
+
+    delta_g = (mysistor.delta_rho_over_potential*potential)/(2*mysistor.rho_b*N_A*peclet_number*potential)
 
     integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(potential,mysistor,), points=length_channel/dx)[0]/length_channel
 
     g_infty = 1 + delta_g*integral_ginfty
 
-    print(delta_g, integral_ginfty, mysistor.peclet_number)
+    print(delta_g, integral_ginfty, peclet_number)
 
     return g_infty
 
@@ -181,12 +189,6 @@ def update_memristors(circ, tstep, x):
             
             # g_infinity = sigmoid(potential_drop)*elem.g_0
             g_infinity = g_infinity_func(potential_drop, elem)*elem.g_0
-            # # g_infinity = 3
-            
-            # if elem.part_id=='M2':
-            #     g_infinity = (sigmoid(potential_drop)+0.001)*elem.g_0 
-                
-            # print(g_infinity)
 
             if np.abs(g_infinity - conductance)<1e-7:
                 increment=0
@@ -196,9 +198,6 @@ def update_memristors(circ, tstep, x):
             conductance += increment  
 
             elem.value=1/conductance
-
-            # if elem.part_id=='M1':
-            #     print(g_infinity - conductance, increment)
 
     return
 
