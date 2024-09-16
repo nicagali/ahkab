@@ -141,9 +141,9 @@ def integrand(x,potential,  mysistor, peclet_number):
         
         integrand2den = np.exp(peclet_number*mysistor.radius_tip/mysistor.radius_base) - 1
 
-        # print(peclet_number*potential)
-
         integrand = integrand1 - integrand2num/integrand2den
+
+        # print(integrand1, integrand2num, integrand2den, integrand)
 
     return integrand
 
@@ -191,6 +191,7 @@ def update_memristors(circ, tstep, x):
 
             # g_infinity = sigmoid(potential_drop)*elem.g_0
             g_infinity = g_infinity_func(potential_drop, elem)*elem.g_0
+            print(elem, g_infinity)
 
 
 
