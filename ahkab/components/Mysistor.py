@@ -41,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048):
+    def __init__(self, part_id, n1, n2, value, rho_b=1, length_channel=10e-6, rbrt=4, tau=0.0048):
 
         # ID and nodes
         self.part_id = part_id
@@ -49,6 +49,7 @@ class Mysistor(Component):
         self.is_symbolic = True
         self.n1 = n1
         self.n2 = n2
+        
         # read inputs
         self._value = value     # reiststance [Ohm]
         self._g = 1./value      # conductance
@@ -58,19 +59,27 @@ class Mysistor(Component):
         self.length_channel = length_channel    
         self.rbrt = rbrt
 
-        self.radius_tip = 50e-9     # [m]
-        self.radius_base = self.rbrt*self.radius_tip
+        self.radius_base = 1.04e-6     # [m] - Tim paper
+        self.radius_tip = 0.17e-6     # [m] - Tim paper
+        
+        # self.radius_tip = 50e-9     # [m]
+        # self.radius_base = self.rbrt*self.radius_tip
         self.delta_radius = self.radius_base - self.radius_tip
         average_radius = (self.radius_base**2 + self.radius_tip**2 + self.radius_base*self.radius_tip)/3
+
 
         # constants
         electron_charge = 1.602e-19   # [C] = [A s]
         kbT = (1.38e-23)*(293.15)      # [J] = [kg m^2 s^-2]
-        sigma = -0.0015e18     #surface charge [m^-2]
         eta = 1.01e-3      #viscosity [Pa s] = [kg m^-1 s^-1] 
         epsilon = 0.71e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
-        phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
-        diff_coefficient = 1.75e-9      # [m^2 s^-1]
+        # sigma = -0.0015e18     #surface charge [m^-2]
+        # phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
+        # diff_coefficient = 1.75e-9      # [m^2 s^-1]
+
+        sigma = -0.02e18     #surface charge [m^-2] - Tim paper
+        phi0 = -40e-3      # [V] = [kg m^2 s^-3 A^-1] - Tim paper
+        diff_coefficient = 1e-9      # [m^2 s^-1] - Tim paper
 
         # derived constants
         w = (electron_charge*diff_coefficient*eta)/(kbT*epsilon*phi0)
