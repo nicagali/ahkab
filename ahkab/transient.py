@@ -145,6 +145,21 @@ def integrand(x,  mysistor, peclet_number):
 
     return integrand
 
+def density(x,  potential, pressure, mysistor):
+
+    density=0
+    
+    delta_rho = mysistor.delta_rho_over_potential*potential
+
+    peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
+    print(peclet_number)
+
+    delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
+
+    density = 1 + delta_g*integrand(x, mysistor, peclet_number)
+
+    return density
+
 # Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
 
 def g_infinity_func(potential, pressure, mysistor): 
