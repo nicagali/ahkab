@@ -41,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value, rho_b=0.2, length_channel=1e-6, rbrt=4, tau=0.0048):
+    def __init__(self, part_id, n1, n2, value, rho_b=0.2, length_channel=10e-6, rbrt=4, tau=0.0048):
         self.part_id = part_id
         self._value = value
         self._g = 1./value
