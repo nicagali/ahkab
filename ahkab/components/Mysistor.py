@@ -59,11 +59,11 @@ class Mysistor(Component):
         self.length_channel = length_channel    
         self.rbrt = rbrt
 
-        self.radius_base = 1.04e-6     # [m] - Tim paper
-        self.radius_tip = 0.17e-6     # [m] - Tim paper
+        # self.radius_base = 1.04e-6     # [m] - Tim paper
+        # self.radius_tip = 0.17e-6     # [m] - Tim paper
         
-        # self.radius_tip = 50e-9     # [m]
-        # self.radius_base = self.rbrt*self.radius_tip
+        self.radius_tip = 50e-9     # [m]
+        self.radius_base = self.rbrt*self.radius_tip
         self.delta_radius = self.radius_base - self.radius_tip
         average_radius = (self.radius_base**2 + self.radius_tip**2 + self.radius_base*self.radius_tip)/3
 
