@@ -127,7 +127,7 @@ def sigmoid(potential):
 
 # Integrand in the definition of average concentration
 
-def integrand(x,potential,  mysistor, peclet_number):
+def integrand(x,  mysistor, peclet_number):
 
     integrand=0
 
