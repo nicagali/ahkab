@@ -73,13 +73,13 @@ class Mysistor(Component):
         kbT = (1.38e-23)*(293.15)      # [J] = [kg m^2 s^-2]
         eta = 1.01e-3      #viscosity [Pa s] = [kg m^-1 s^-1] 
         epsilon = 0.71e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
-        # sigma = -0.0015e18     #surface charge [m^-2]
-        # phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
-        # diff_coefficient = 1.75e-9      # [m^2 s^-1]
+        sigma = -0.0015e18     #surface charge [m^-2]
+        phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
+        diff_coefficient = 1.75e-9      # [m^2 s^-1]
 
-        sigma = -0.02e18     #surface charge [m^-2] - Tim paper
-        phi0 = -40e-3      # [V] = [kg m^2 s^-3 A^-1] - Tim paper
-        diff_coefficient = 1e-9      # [m^2 s^-1] - Tim paper
+        # sigma = -0.02e18     #surface charge [m^-2] - Tim paper
+        # phi0 = -40e-3      # [V] = [kg m^2 s^-3 A^-1] - Tim paper
+        # diff_coefficient = 1e-9      # [m^2 s^-1] - Tim paper
 
         # derived constants
         w = (electron_charge*diff_coefficient*eta)/(kbT*epsilon*phi0)
