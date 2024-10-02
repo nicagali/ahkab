@@ -42,7 +42,7 @@ class Mysistor(Component):
     #                \/    \/    \/
     #
     def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048):
-
+        print('Ahkab in branch pressureandpotential')
         # ID and nodes
         self.part_id = part_id
         self.is_nonlinear = False
