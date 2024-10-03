@@ -58,9 +58,6 @@ class Mysistor(Component):
         self.rho_b = rho_b * N_A     #bulk density [m^-3]
         self.length_channel = length_channel    
         self.rbrt = rbrt
-
-        # self.radius_base = 1.04e-6     # [m] - Tim paper
-        # self.radius_tip = 0.17e-6     # [m] - Tim paper
         
         self.radius_tip = 50e-9     # [m]
         self.radius_base = self.rbrt*self.radius_tip
@@ -76,10 +73,6 @@ class Mysistor(Component):
         sigma = -0.0015e18     #surface charge [m^-2]
         phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
         diff_coefficient = 1.75e-9      # [m^2 s^-1]
-
-        # sigma = -0.02e18     #surface charge [m^-2] - Tim paper
-        # phi0 = -40e-3      # [V] = [kg m^2 s^-3 A^-1] - Tim paper
-        # diff_coefficient = 1e-9      # [m^2 s^-1] - Tim paper
 
         # derived constants
         w = (electron_charge*diff_coefficient*eta)/(kbT*epsilon*phi0)
