@@ -131,7 +131,7 @@ def integrand(x,  mysistor, peclet_number):
 
     integrand=0
 
-    if np.abs(peclet_number)>=0.1:
+    if np.abs(peclet_number)>=1e-7:
 
         radius_x = mysistor.radius_base - (x*mysistor.delta_radius)/mysistor.length_channel
 
@@ -162,6 +162,8 @@ def g_infinity_func(potential, pressure, mysistor):
 
     g_infty = 1 + delta_g*integral_ginfty
 
+    # print('potential=', potential, 'pressure=', pressure, delta_g, integral_ginfty)
+
     return g_infty
 
 
@@ -189,7 +191,7 @@ def update_memristors(circ, tstep, x):
 
             # print(potential_drop, conductance, g_infinity, g_infinity - conductance)
 
-            if np.abs(g_infinity - conductance)<1e-3:
+            if np.abs(g_infinity - conductance)<1e-7:
                 increment=0
             else:
                 increment = (g_infinity - conductance)/(elem.tau)*tstep

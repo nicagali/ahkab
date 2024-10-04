@@ -41,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value, rho_b=1, length_channel=10e-6, rbrt=4, tau=0.0048):
+    def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048, pressure=0):
 
         # ID and nodes
         self.part_id = part_id
@@ -58,6 +58,7 @@ class Mysistor(Component):
         self.rho_b = rho_b * N_A     #bulk density [m^-3]
         self.length_channel = length_channel    
         self.rbrt = rbrt
+        self.pressure = pressure
         
         self.radius_tip = 50e-9     # [m]
         self.radius_base = self.rbrt*self.radius_tip
