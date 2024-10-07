@@ -158,7 +158,7 @@ def g_infinity_func(potential, mysistor):
 
     delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
 
-    integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(potential, mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
+    integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
     g_infty = 1 + delta_g*integral_ginfty
 
