@@ -155,6 +155,8 @@ def g_infinity_func(potential, mysistor):
     delta_rho = mysistor.delta_rho_over_potential*potential
 
     peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential)
+    print(mysistor.peclet_over_q, mysistor.q_potential, peclet_number, potential)
+
 
     delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
 
