@@ -518,10 +518,10 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
 
             time = time + old_step
             x = x1
-            print('onex', x)
+            # print('onex', x)
             iter_n = iter_n + 1
             sol.add_line(time, x)
-            print(sol)
+            # print(sol)
 
             dxdt = np.multiply(x_coeff, x) + const
             thebuffer.add((time, x, dxdt))
