@@ -496,6 +496,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
 
             time = time + old_step
             x = x1
+            print('onex', x)
             iter_n = iter_n + 1
             sol.add_line(time, x)
 
