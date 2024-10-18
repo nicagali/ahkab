@@ -207,8 +207,22 @@ def update_memristors(circ, tstep, x):
 
     return
 
+def update_res_vec(circ, vec):
+    
+    line_to_add = []
+    
+    for elem in circ:
+
+        if isinstance(elem, components.Mysistor): 
+            
+            line_to_add.append(elem.value)
+            
+    vec.append(line_to_add)
+    
+    return vec
+
 def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_method, use_step_control=True, x0=None,
-                       mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3):
+                       mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3, conductances=False):
     
 
     """Performs a transient analysis of the circuit described by circ.
@@ -415,6 +429,13 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     printing.print_info_line(("Solving... ", 3), verbose, print_nl=False)
     tick = ticker.ticker(increments_for_step=1)
     tick.display(verbose > 1)
+    
+    # numb_edges = 0
+    # if conductances:
+    #         for elem in circ:
+    #             if isinstance(elem, components.Mysistor):
+    #                 numb_edges+=1
+    resistances_vec = []
 
     while time < tstop:
 
@@ -492,6 +513,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
             # disabled, or it's enabled and the error is small
             # enough. Anyway, the result is GOOD, STORE IT.
 
+            resistances_vec = update_res_vec(circ, resistances_vec)
             update_memristors(circ, tstep, x1)
 
             time = time + old_step
@@ -499,6 +521,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
             print('onex', x)
             iter_n = iter_n + 1
             sol.add_line(time, x)
+            print(sol)
 
             dxdt = np.multiply(x_coeff, x) + const
             thebuffer.add((time, x, dxdt))
@@ -540,8 +563,9 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     else:
         print("failed.")
         ret_value =  None
+        
 
-    return ret_value
+    return ret_value, resistances_vec
 
 
 def check_step(tstep, time, tstop, HMAX):

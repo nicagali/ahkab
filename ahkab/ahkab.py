@@ -143,6 +143,7 @@ All methods in alphabetical order
 
 """
 
+
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
 
@@ -320,7 +321,7 @@ def new_dc(start, stop, points, source, sweep_type='LINEAR', guess=True, x0=None
 
 
 def new_tran(tstart, tstop, tstep, x0='op', method=transient.TRAP,
-        use_step_control=True, outfile=None, verbose=0):
+        use_step_control=True, outfile=None, verbose=0, conductances=False):
 
     """Assembles a TRAN analysis and returns the analysis object.
 
@@ -382,7 +383,7 @@ def new_tran(tstart, tstop, tstep, x0='op', method=transient.TRAP,
         outfile += '.tran'
     return {"type": "tran", "tstart": tstart, "tstop": tstop, "tstep": tstep,
             "method": method, "use_step_control": use_step_control, 'x0': x0,
-            'outfile': outfile, 'verbose': verbose}
+            'outfile': outfile, 'verbose': verbose, 'conductances': conductances}
 
 
 def new_ac(start, stop, points, x0='op', sweep_type='LOG', outfile=None, verbose=0):
@@ -717,7 +718,7 @@ def run(circ, an_list=None):
                                    (an_type.upper(), an_item['x0']))
             an_item['x0'] = None
 
-        r = analysis[an_type](circ, **an_item)  
+        r, res_vec = analysis[an_type](circ, **an_item)  
 
         # print(vars(circ[0]))
 
@@ -727,7 +728,8 @@ def run(circ, an_list=None):
             _x0s.update({'op': r})
             _x0s.update({'op+ic': icmodified_x0(circ, r)})
             _handle_netlist_ics(circ, an_list, ic_list=[])
-    return results
+    
+    return results, res_vec
 
 
 def new_x0(circ, icdict):
