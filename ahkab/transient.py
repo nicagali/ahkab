@@ -149,14 +149,21 @@ def integrand(x,  mysistor, peclet_number):
 
 def g_infinity_func(potential, pressure, mysistor): 
     
-
-
     length_channel = mysistor.length_channel
-    dx=1e-7
+    dx=length_channel/1000
     
     delta_rho = mysistor.delta_rho_over_potential*potential
 
     peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
+
+
+    # if abs(peclet_number)<1:
+
+    # if mysistor.part_id == 'R1':
+    #     print("Peclet", peclet_number )
+
+    # if pressure> 0:
+    #     print('pressure', pressure)
 
     delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
 
@@ -192,14 +199,20 @@ def update_memristors(circ, tstep, x):
             # g_infinity = sigmoid(potential_drop)*elem.g_0
             g_infinity = g_infinity_func(potential_drop, pressure_drop, elem)*elem.g_0
 
-            # print(potential_drop, conductance, g_infinity, g_infinity - conductance)
-            # print(potential_drop, pressure_drop)
+            # if elem.part_id == 'R1':
+            #     print(g_infinity-conductance)
 
-            if np.abs(g_infinity - conductance)<1e-5:
-                increment=0
+            # if tstep==1:
+            # print(conductance, g_infinity, potential_drop, pressure_drop)
+
+            if elem.has_converged:
+                increment = 0
             else:
-                increment = (g_infinity - conductance)/(elem.tau)*tstep
-                
+                if np.abs(g_infinity - conductance) < 1e-10:
+                    elem.has_converged = True  # Set the flag to indicate convergence
+                    increment = 0
+                else:
+                    increment = (g_infinity - conductance) / elem.tau * tstep
 
             conductance += increment  
 

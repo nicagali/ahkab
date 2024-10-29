@@ -41,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048, pressure=0):
+    def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048, pressure=0, has_converged=False):
 
 
         # ID and nodes
@@ -50,6 +50,9 @@ class Mysistor(Component):
         self.is_symbolic = True
         self.n1 = n1
         self.n2 = n2
+
+        # convergence
+        self.has_converged = has_converged
         
         # read inputs
         self._value = value     # reiststance [Ohm]
@@ -61,6 +64,7 @@ class Mysistor(Component):
         self.rbrt = rbrt
         self.pressure = pressure
         # print(self.pressure)
+        # print(self.length_channel)
         
         self.radius_tip = 50e-9     # [m]
         self.radius_base = self.rbrt*self.radius_tip
@@ -71,7 +75,7 @@ class Mysistor(Component):
         # constants
         electron_charge = 1.602e-19   # [C] = [A s]
         kbT = (1.38e-23)*(293.15)      # [J] = [kg m^2 s^-2]
-        eta = 1.01e-3      #viscosity [Pa s] = [kg m^-1 s^-1] 
+        eta = 1.01e-3      #viscosity [mPa s] = [kg m^-1 s^-1] 
         epsilon = 0.71e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
         sigma = -0.0015e18     #surface charge [m^-2]
         phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
