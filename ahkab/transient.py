@@ -127,7 +127,15 @@ def sigmoid(potential):
 
 # Integrand in the definition of average concentration
 
-def integrand(x,  mysistor, peclet_number):
+def integrand1(x,  mysistor):
+
+    radius_x = mysistor.radius_base - (x*mysistor.delta_radius)/mysistor.length_channel
+
+    integrand = (x*mysistor.radius_tip)/(radius_x*(mysistor.length_channel))
+
+    return integrand
+
+def integrand2(x,  mysistor, peclet_number):
 
     integrand=0
 
@@ -135,15 +143,13 @@ def integrand(x,  mysistor, peclet_number):
 
         radius_x = mysistor.radius_base - (x*mysistor.delta_radius)/mysistor.length_channel
 
-        integrand1 = (x*mysistor.radius_tip)/(radius_x*(mysistor.length_channel))
-
         integrand2num = np.exp(peclet_number*(x/mysistor.length_channel)*((mysistor.radius_tip)**2/(mysistor.radius_base*radius_x))) - 1
         
         integrand2den = np.exp(peclet_number*mysistor.radius_tip/mysistor.radius_base) - 1
 
-        integrand = (integrand1 - integrand2num/integrand2den)
+        integrand = integrand2num/integrand2den
 
-    return integrand
+    return integrand 
 
 # Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
 
@@ -152,16 +158,17 @@ def g_infinity_func(potential, pressure, mysistor, peclet_number=None):
     length_channel = mysistor.length_channel
     dx=length_channel/1000
     
-    delta_rho = mysistor.delta_rho_over_potential*potential
+    density_inhomo = mysistor.density_inhomo_over_potential*potential
 
     if peclet_number==None:
         peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
 
-    delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
+    delta_g = density_inhomo/(2*mysistor.rho_b*peclet_number)
 
-    integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
+    integral1 = integrate.quad(integrand1, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
+    integral2 = integrate.quad(integrand2, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
-    g_infty = 1 + delta_g*integral_ginfty
+    g_infty = 1 + delta_g*integral1 - (mysistor.delta_rho + delta_g)*integral2
 
     return g_infty
 

@@ -41,7 +41,7 @@ class Mysistor(Component):
     #     n1 o---+  \  /  \  /  \  +---o n2
     #                \/    \/    \/
     #
-    def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048, pressure=0, has_converged=False):
+    def __init__(self, part_id, n1, n2, value, rho_b=0.1, length_channel=10e-6, rbrt=4, tau=0.0048, pressure=0, delta_rho=0, has_converged=False):
 
 
         # ID and nodes
@@ -61,11 +61,9 @@ class Mysistor(Component):
         N_A = 6.022e23      #Avogadro numeber   [1]
         self.rho_b = rho_b * N_A     #bulk density [m^-3]
         self.length_channel = length_channel 
-        # print(self.length_channel)   
         self.rbrt = rbrt
         self.pressure = pressure
-        # print(self.pressure)
-        # print(self.length_channel)
+        self.delta_rho = delta_rho
         
         self.radius_tip = 50e-9     # [m]
         self.radius_base = self.rbrt*self.radius_tip
@@ -97,7 +95,7 @@ class Mysistor(Component):
         
         # VOLTAGE AND PRESSURE
         
-        self.delta_rho_over_potential = (2*(self.delta_radius)*sigma*electron_charge)/(kbT*self.radius_tip**2)
+        self.density_inhomo_over_potential = (2*(self.delta_radius)*sigma*electron_charge)/(kbT*self.radius_tip**2)
         
         self.q_potential = (-np.pi)*self.radius_base*self.radius_tip*epsilon*phi0/(eta*self.length_channel)
         
