@@ -60,7 +60,8 @@ class Mysistor(Component):
         self.tau = tau      # relaxation period [s]   
         N_A = 6.022e23      #Avogadro numeber   [1]
         self.rho_b = rho_b * N_A     #bulk density [m^-3]
-        self.length_channel = length_channel    
+        self.length_channel = length_channel 
+        # print(self.length_channel)   
         self.rbrt = rbrt
         self.pressure = pressure
         # print(self.pressure)

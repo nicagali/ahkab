@@ -147,31 +147,21 @@ def integrand(x,  mysistor, peclet_number):
 
 # Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
 
-def g_infinity_func(potential, pressure, mysistor): 
+def g_infinity_func(potential, pressure, mysistor, peclet_number=None): 
     
     length_channel = mysistor.length_channel
     dx=length_channel/1000
     
     delta_rho = mysistor.delta_rho_over_potential*potential
 
-    peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
-
-
-    # if abs(peclet_number)<1:
-
-    # if mysistor.part_id == 'R1':
-    #     print("Peclet", peclet_number )
-
-    # if pressure> 0:
-    #     print('pressure', pressure)
+    if peclet_number==None:
+        peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
 
     delta_g = delta_rho/(2*mysistor.rho_b*peclet_number)
 
     integral_ginfty = integrate.quad(integrand, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
     g_infty = 1 + delta_g*integral_ginfty
-
-    # print('potential=', potential, 'pressure=', pressure, delta_g, integral_ginfty)
 
     return g_infty
 
