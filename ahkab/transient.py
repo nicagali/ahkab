@@ -153,22 +153,21 @@ def integrand2(x,  mysistor, peclet_number):
 
 # Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
 
-def g_infinity_func(potential, pressure, mysistor, peclet_number=None): 
+def g_infinity_func(potential, pressure, concentration, mysistor): 
     
     length_channel = mysistor.length_channel
     dx=length_channel/1000
     
     density_inhomo = mysistor.density_inhomo_over_potential*potential
 
-    if peclet_number==None:
-        peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
+    peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
 
     delta_g = density_inhomo/(2*mysistor.rho_b*peclet_number)
 
     integral1 = integrate.quad(integrand1, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
     integral2 = integrate.quad(integrand2, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
-    g_infty = 1 + delta_g*integral1 - (mysistor.delta_rho + delta_g)*integral2
+    g_infty = 1 + delta_g*integral1 - (concentration + delta_g)*integral2
 
     return g_infty
 
@@ -192,15 +191,10 @@ def update_memristors(circ, tstep, x):
 
             # pressure_drop = 0
             pressure_drop = elem.pressure
+            concentration_drop = elem.delta_rho
 
             # g_infinity = sigmoid(potential_drop)*elem.g_0
-            g_infinity = g_infinity_func(potential_drop, pressure_drop, elem)*elem.g_0
-
-            # if elem.part_id == 'R1':
-            #     print(g_infinity-conductance)
-
-            # if tstep==1:
-            # print(conductance, g_infinity, potential_drop, pressure_drop)
+            g_infinity = g_infinity_func(potential_drop, pressure_drop, concentration_drop, elem)*elem.g_0
 
             if elem.has_converged:
                 increment = 0
