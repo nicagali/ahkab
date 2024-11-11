@@ -59,6 +59,7 @@ class Mysistor(Component):
         self._g = 1./value      # conductance
         self.tau = tau      # relaxation period [s]   
         N_A = 6.022e23      #Avogadro numeber   [1]
+        # print(rho_b)
         self.rho_b = rho_b * N_A     #bulk density [m^-3]
         self.length_channel = length_channel 
         self.rbrt = rbrt
