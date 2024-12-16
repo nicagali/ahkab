@@ -172,16 +172,13 @@ def g_infinity_func(potential, pressure, concentration, mysistor):
 
     peclet_number = mysistor.peclet_over_q * (mysistor.q_potential*potential + mysistor.q_pressure*pressure)
 
-    # print(peclet_number)
-
     integral2 = integrate.quad(integrand2, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
-    if peclet_number < 0.001*(mysistor.radius_base/mysistor.radius_tip)**2:
-    #     print(peclet_number, potential, pressure)
+    if peclet_number < 1e-9*(mysistor.radius_base/mysistor.radius_tip)**2:
 
-        integral3 = integrate.quad(integrand1, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
+        integral3 = integrate.quad(integrand3, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
 
-        g_infty = 1 - (concentration/mysistor.rho_b)*integral2 + (density_inhomo/4*mysistor.rho_b)*integral3
+        g_infty = 1 - (concentration/mysistor.rho_b)*integral2 + (density_inhomo/(4*mysistor.rho_b))*integral3
 
     else:
 
@@ -190,8 +187,6 @@ def g_infinity_func(potential, pressure, concentration, mysistor):
         integral1 = integrate.quad(integrand1, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
         
         g_infty = 1 + delta_g*integral1 - (concentration/mysistor.rho_b + delta_g)*integral2
-
-
 
     return g_infty
 
