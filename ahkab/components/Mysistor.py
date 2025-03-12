@@ -65,6 +65,7 @@ class Mysistor(Component):
         self.radius_base = radius_base
         self.pressure = pressure
         self.delta_rho = delta_rho
+        # print(self.delta_rho)
         
         self.radius_tip = 50e-9     # [m]
         # self.radius_base = self.rbrt*self.radius_tip

@@ -718,7 +718,11 @@ def run(circ, an_list=None):
                                    (an_type.upper(), an_item['x0']))
             an_item['x0'] = None
 
-        r, res_vec = analysis[an_type](circ, **an_item)  
+        if an_type == 'tran':
+            r, res_vec = analysis[an_type](circ, **an_item)  
+        else:
+            r = analysis[an_type](circ, **an_item)  
+            res_vec = []
 
         # print(vars(circ[0]))
 
