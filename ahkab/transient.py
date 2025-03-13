@@ -41,7 +41,7 @@ from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
 
 import sys
-import imp
+import importlib as imp
 
 import numpy as np
 import scipy.integrate as integrate
