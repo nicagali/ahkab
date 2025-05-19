@@ -163,7 +163,20 @@ def integrand3(x,  mysistor):
 
 # Compute integral and give the value of g/g_0 = \rho_s (=average concentration)
 
-def g_infinity_func(potential, pressure, concentration, mysistor): 
+def functional_form(x):
+    return (np.sin(1.1*x+1))/3
+
+def g_force_through(x, x0, y0):
+    raw = functional_form(x)
+    adjustment = y0 - functional_form(x0)
+    return raw + adjustment
+
+def g_infinity_func(potential, pressure, concentration, mysistor, change_func=False): 
+    
+    # if change_func:
+    #     print(change_func)
+    # if change_func and mysistor.part_id=='M1':
+    #     potential = 2*1.0004030286316947 - potential
     
     length_channel = mysistor.length_channel
     dx=length_channel/1000
@@ -174,24 +187,29 @@ def g_infinity_func(potential, pressure, concentration, mysistor):
 
     integral2 = integrate.quad(integrand2, 0, length_channel, args=(mysistor,peclet_number,), points=length_channel/dx)[0]/length_channel
 
-    if peclet_number < 1e-9*(mysistor.radius_base/mysistor.radius_tip)**2:
+    if np.abs(peclet_number) < 1e-9*(mysistor.radius_base/mysistor.radius_tip)**2:
 
         integral3 = integrate.quad(integrand3, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
 
         g_infty = 1 - (concentration/mysistor.rho_b)*integral2 + (density_inhomo/(4*mysistor.rho_b))*integral3
-
+        
     else:
 
         delta_g = density_inhomo/(2*mysistor.rho_b*peclet_number)
 
         integral1 = integrate.quad(integrand1, 0, length_channel, args=(mysistor,), points=length_channel/dx)[0]/length_channel
-        
+            
         g_infty = 1 + delta_g*integral1 - (concentration/mysistor.rho_b + delta_g)*integral2
 
+    if change_func and mysistor.part_id=='M1':
+        
+        # g_infty = 2*(12.394654281291412)/mysistor.g_0 - g_infty
+        g_infty = g_force_through(potential, 1, (12.394654281291412)/mysistor.g_0)
+        
     return g_infty
 
 
-def update_memristors(circ, tstep, x):
+def update_memristors(circ, tstep, x, change_func=False):
 
     for elem in circ:
 
@@ -212,8 +230,14 @@ def update_memristors(circ, tstep, x):
             pressure_drop = elem.pressure
             concentration_drop = elem.delta_rho
 
-            # g_infinity = sigmoid(potential_drop)*elem.g_0
-            g_infinity = g_infinity_func(potential_drop, pressure_drop, concentration_drop, elem)*elem.g_0
+            g_infinity = sigmoid(potential_drop)*elem.g_0
+            # print(potential_drop)
+            # if potential_drop>1.5 and elem.part_id=='R1':
+            #     # print('changing')
+            #     g_infinity = g_infinity_func(potential_drop, pressure_drop, concentration_drop, elem)*elem.g_0/2
+            # else:
+            g_infinity = g_infinity_func(potential_drop, pressure_drop, concentration_drop, elem, change_func)*elem.g_0
+
 
             if elem.has_converged:
                 increment = 0
@@ -222,6 +246,7 @@ def update_memristors(circ, tstep, x):
                     elem.has_converged = True  # Set the flag to indicate convergence
                     increment = 0
                 else:
+                    # print(g_infinity, conductance, g_infinity - conductance, elem.tau, (g_infinity - conductance) / elem.tau, tstep, (g_infinity - conductance) / elem.tau * tstep)
                     increment = (g_infinity - conductance) / elem.tau * tstep
 
             conductance += increment  
@@ -241,11 +266,12 @@ def update_res_vec(circ, vec):
             line_to_add.append(elem.value)
             
     vec.append(line_to_add)
+    # print(line_to_add[0])
     
     return vec
 
 def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_method, use_step_control=True, x0=None,
-                       mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3, conductances=False):
+                       mna=None, N=None, D=None, outfile="stdout", return_req_dict=None, verbose=3, conductances=False, change_func=False):
     
 
     """Performs a transient analysis of the circuit described by circ.
@@ -453,11 +479,6 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
     tick = ticker.ticker(increments_for_step=1)
     tick.display(verbose > 1)
     
-    # numb_edges = 0
-    # if conductances:
-    #         for elem in circ:
-    #             if isinstance(elem, components.Mysistor):
-    #                 numb_edges+=1
     resistances_vec = []
 
     while time < tstop:
@@ -537,7 +558,7 @@ def transient_analysis(circ, tstart, tstep, tstop, method=options.default_tran_m
             # enough. Anyway, the result is GOOD, STORE IT.
 
             resistances_vec = update_res_vec(circ, resistances_vec)
-            update_memristors(circ, tstep, x1)
+            update_memristors(circ, tstep, x1, change_func)
 
             time = time + old_step
             x = x1

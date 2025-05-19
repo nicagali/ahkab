@@ -321,7 +321,7 @@ def new_dc(start, stop, points, source, sweep_type='LINEAR', guess=True, x0=None
 
 
 def new_tran(tstart, tstop, tstep, x0='op', method=transient.TRAP,
-        use_step_control=True, outfile=None, verbose=0, conductances=False):
+        use_step_control=True, outfile=None, verbose=0, conductances=False, change_func=False):
 
     """Assembles a TRAN analysis and returns the analysis object.
 
@@ -383,7 +383,8 @@ def new_tran(tstart, tstop, tstep, x0='op', method=transient.TRAP,
         outfile += '.tran'
     return {"type": "tran", "tstart": tstart, "tstop": tstop, "tstep": tstep,
             "method": method, "use_step_control": use_step_control, 'x0': x0,
-            'outfile': outfile, 'verbose': verbose, 'conductances': conductances}
+            'outfile': outfile, 'verbose': verbose, 'conductances': conductances, 
+            'change_func': change_func}
 
 
 def new_ac(start, stop, points, x0='op', sweep_type='LOG', outfile=None, verbose=0):
