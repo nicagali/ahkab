@@ -62,6 +62,7 @@ class Mysistor(Component):
         # print(rho_b)
         self.rho_b = rho_b * N_A     #bulk density [m^-3]
         self.length_channel = length_channel 
+        self.initial_length = length_channel
         self.radius_base = radius_base
         self.pressure = pressure
         self.delta_rho = delta_rho
@@ -105,6 +106,42 @@ class Mysistor(Component):
         self.q_pressure = (np.pi*(self.radius_base*self.radius_tip)**3)/(8*self.length_channel*eta*average_radius)
 
         self.peclet_over_q = length_channel/(diff_coefficient*np.pi*self.radius_tip**2)
+
+
+    def init_derived_param(self):
+
+        # constants
+        electron_charge = 1.602e-19   # [C] = [A s]
+        kbT = (1.38e-23)*(293.15)      # [J] = [kg m^2 s^-2]
+        eta = 1.01e-3      #viscosity [mPa s] = [kg m^-1 s^-1] 
+        epsilon = 0.71e-9     # [F m^-1] = [kg^-1 m^-1 s^4 A^2]
+        sigma = -0.0015e18     #surface charge [m^-2]
+        phi0 = -10e-3      # [V] = [kg m^2 s^-3 A^-1]
+        diff_coefficient = 1.75e-9      # [m^2 s^-1]
+
+        # derived constants
+        w = (electron_charge*diff_coefficient*eta)/(kbT*epsilon*phi0)
+        Du = sigma/(2*self.rho_b*self.radius_tip)
+        average_radius = (self.radius_base**2 + self.radius_tip**2 + self.radius_base*self.radius_tip)/3
+
+        # Ohmic conductance
+        g_1 = np.pi*self.radius_tip*self.radius_base/self.length_channel
+        g_2 = 2*self.rho_b*(electron_charge**2)*diff_coefficient/kbT
+        
+        self.g_0 = g_1*g_2*1e12     # [S]
+
+        # ONLY VOLTAGE
+        self.delta_g = (-2)*(w)*self.delta_radius*Du/self.radius_base
+        
+        # VOLTAGE AND PRESSURE
+        
+        self.density_inhomo_over_potential = (2*(self.delta_radius)*sigma*electron_charge)/(kbT*self.radius_tip**2)
+        
+        self.q_potential = (-np.pi)*self.radius_base*self.radius_tip*epsilon*phi0/(eta*self.length_channel)
+        
+        self.q_pressure = (np.pi*(self.radius_base*self.radius_tip)**3)/(8*self.length_channel*eta*average_radius)
+
+        self.peclet_over_q = self.length_channel/(diff_coefficient*np.pi*self.radius_tip**2)
         
 
     @property
