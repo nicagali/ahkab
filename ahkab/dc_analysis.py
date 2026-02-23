@@ -1042,7 +1042,7 @@ def generate_mna_and_N(circ, verbose=3):
             mna[index, elem.n2] = -1.0
             if isinstance(elem, components.sources.VSource) and not elem.is_timedependent:
                 # corretto, se e' def una parte tempo-variabile ci pensa
-                # mdn_solver a scegliere quella giusta da usare.
+                # mdn_solver a scegliere quella giusta da usare.]
                 N[index, 0] = -1.0 * elem.V()
             elif isinstance(elem, components.sources.VSource) and elem.is_timedependent:
                 pass  # taken care step by step
